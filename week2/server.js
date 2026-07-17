@@ -60,7 +60,7 @@ app.use((err, req, res, next) => {
 
 app.listen(PORT, () => {
   console.log(`=========================================`);
-  console.log(`🚀 Week 2 Express server running on port: ${PORT}`);
-  console.log(`🔗 Interface: http://localhost:${PORT}`);
+  console.log(` Week 2 Express server running on port: ${PORT}`);
+  console.log(` Interface: http://localhost:${PORT}`);
   console.log(`=========================================`);
 });
