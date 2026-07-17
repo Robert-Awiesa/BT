@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Interactive testing dashboard for BeTechified Backend Development Week 2 API assignment.">
+  <title>My Week 2 API! | BeTechified</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="glass-bg"></div>
+  <div class="app-container">
+    <header class="app-header">
+      <div class="logo">BeTechified</div>
+      <h1 class="main-title">My Week 2 API!</h1>
+      <p class="subtitle">Interactive Testing Dashboard & API console</p>
+    </header>
+
+    <main class="dashboard-grid">
+      <!-- Endpoint: POST /user -->
+      <section class="card endpoint-card" id="post-user-card">
+        <div class="card-header">
+          <span class="badge method-post">POST</span>
+          <span class="endpoint-path">/user</span>
+        </div>
+        <div class="card-body">
+          <p class="endpoint-desc">Accepts name and email in JSON body. Returns a personalized greeting.</p>
+          <form id="post-user-form" class="api-form">
+            <div class="form-group">
+              <label for="post-name">Full Name</label>
+              <input type="text" id="post-name" placeholder="John Doe" autocomplete="name">
+            </div>
+            <div class="form-group">
+              <label for="post-email">Email Address</label>
+              <input type="email" id="post-email" placeholder="john@example.com" autocomplete="email">
+            </div>
+            <button type="submit" class="btn btn-primary" id="btn-submit-post">
+              <span>Send Request</span>
+              <svg class="icon" viewBox="0 0 24 24" width="16" height="16">
+                <path fill="currentColor" d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+              </svg>
+            </button>
+          </form>
+        </div>
+      </section>
+
+      <!-- Endpoint: GET /user/:id -->
+      <section class="card endpoint-card" id="get-user-card">
+        <div class="card-header">
+          <span class="badge method-get">GET</span>
+          <span class="endpoint-path">/user/:id</span>
+        </div>
+        <div class="card-body">
+          <p class="endpoint-desc">Retrieves profiles by sending a dynamic User ID parameter in the URL route.</p>
+          <form id="get-user-form" class="api-form">
+            <div class="form-group">
+              <label for="get-id">User ID</label>
+              <input type="text" id="get-id" placeholder="42" required>
+            </div>
+            <button type="submit" class="btn btn-secondary" id="btn-submit-get">
+              <span>Fetch Profile</span>
+              <svg class="icon" viewBox="0 0 24 24" width="16" height="16">
+                <path fill="currentColor" d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+              </svg>
+            </button>
+          </form>
+        </div>
+      </section>
+
+      <!-- API Console Output -->
+      <section class="card console-card">
+        <div class="card-header console-header">
+          <div class="header-left">
+            <div class="console-dot red"></div>
+            <div class="console-dot yellow"></div>
+            <div class="console-dot green"></div>
+            <span class="console-title">Live Request & Response Logs</span>
+          </div>
+          <button id="btn-clear-console" class="btn-text">Clear Console</button>
+        </div>
+        <div class="console-output" id="console-logs">
+          <div class="console-line system-msg">
+            <span class="time">[System]</span> Welcome! Submit the forms above or query the endpoints directly to view live logs.
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="app-footer">
+      <p>&copy; 2026 BeTechified Backend Course - Week 2. Created with ❤️</p>
+    </footer>
+  </div>
+
+  <script>
+    const consoleLogs = document.getElementById('console-logs');
+    const postForm = document.getElementById('post-user-form');
+    const getForm = document.getElementById('get-user-form');
+    const clearBtn = document.getElementById('btn-clear-console');
+
+    // Helper to format timestamps
+    function getTimestamp() {
+      const now = new Date();
+      return now.toTimeString().split(' ')[0];
+    }
+
+    // Helper to write to console
+    function logToConsole(type, text, details = null) {
+      const line = document.createElement('div');
+      line.className = `console-line ${type}`;
+
+      const timestamp = document.createElement('span');
+      timestamp.className = 'time';
+      timestamp.textContent = `[${getTimestamp()}]`;
+      line.appendChild(timestamp);
+
+      const content = document.createElement('span');
+      content.className = 'content';
+      content.innerHTML = text;
+      line.appendChild(content);
+
+      if (details) {
+        const pre = document.createElement('pre');
+        pre.className = 'details';
+        pre.textContent = typeof details === 'object' ? JSON.stringify(details, null, 2) : details;
+        line.appendChild(pre);
+      }
+
+      consoleLogs.appendChild(line);
+      consoleLogs.scrollTop = consoleLogs.scrollHeight;
+    }
+
+    // Clear console
+    clearBtn.addEventListener('click', () => {
+      consoleLogs.innerHTML = `
+        <div class="console-line system-msg">
+          <span class="time">[System]</span> Console cleared.
+        </div>
+      `;
+    });
+
+    // POST /user handler
+    postForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('post-name').value;
+      const email = document.getElementById('post-email').value;
+
+      logToConsole('req-sent', `<strong>Sending POST</strong> /user`, { name, email });
+
+      try {
+        const response = await fetch('/user', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json, text/plain, */*'
+          },
+          body: JSON.stringify({ name, email })
+        });
+
+        const statusClass = response.ok ? 'status-ok' : 'status-err';
+        const contentType = response.headers.get('content-type');
+        let body;
+
+        if (contentType && contentType.includes('application/json')) {
+          body = await response.json();
+        } else {
+          body = await response.text();
+        }
+
+        logToConsole(
+          response.ok ? 'resp-ok' : 'resp-err',
+          `<strong>Received Response</strong> | Status: <span class="${statusClass}">${response.status} ${response.statusText}</span>`,
+          body
+        );
+      } catch (err) {
+        logToConsole('resp-err', `<strong>Network Error:</strong> Failed to fetch /user`, err.message);
+      }
+    });
+
+    // GET /user/:id handler
+    getForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const userId = document.getElementById('get-id').value;
+
+      logToConsole('req-sent', `<strong>Sending GET</strong> /user/${encodeURIComponent(userId)}`);
+
+      try {
+        const response = await fetch(`/user/${encodeURIComponent(userId)}`, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json, text/plain, */*'
+          }
+        });
+
+        const statusClass = response.ok ? 'status-ok' : 'status-err';
+        const contentType = response.headers.get('content-type');
+        let body;
+
+        if (contentType && contentType.includes('application/json')) {
+          body = await response.json();
+        } else {
+          body = await response.text();
+        }
+
+        logToConsole(
+          response.ok ? 'resp-ok' : 'resp-err',
+          `<strong>Received Response</strong> | Status: <span class="${statusClass}">${response.status} ${response.statusText}</span>`,
+          body
+        );
+      } catch (err) {
+        logToConsole('resp-err', `<strong>Network Error:</strong> Failed to fetch /user/${userId}`, err.message);
+      }
+    });
+  </script>
+</body>
+</html>
